@@ -1,13 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MCP_SERVERS } from '@/lib/mcp-servers';
+import { forbiddenOrigin, isOriginAllowed, withCors } from '@/lib/cors';
 
 // MCP Server implementation for Next.js API route
 // This acts as a proxy/aggregator to other MCP servers
 
 export const runtime = 'edge';
 
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin');
+  if (!origin || !isOriginAllowed(origin)) return forbiddenOrigin();
+  return withCors(new NextResponse(null, { status: 204 }), origin);
+}
+
 // Handle GET requests - return server info
-export async function GET() {
+export async function GET(request: NextRequest) {
+  return withCors(serverInfo(), request.headers.get('origin'));
+}
+
+function serverInfo() {
   return NextResponse.json({
     name: 'MCP List Hub',
     version: '1.0.0',
@@ -142,4 +153,9 @@ async function handleMCPRequest(request: NextRequest) {
   }
 }
 
-export { handleMCPRequest as POST };
+export async function POST(request: NextRequest) {
+  const origin = request.headers.get('origin');
+  // Reject before parsing so a foreign page cannot trigger a proxied call.
+  if (!isOriginAllowed(origin)) return forbiddenOrigin();
+  return withCors(await handleMCPRequest(request), origin);
+}
