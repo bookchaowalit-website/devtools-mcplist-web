@@ -15,10 +15,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Shared Node CI: npm ci, lint, typecheck, tests when present, next build. Fails closed.
+  # Shared Node CI: npm ci, lint, typecheck, Vitest with a line-coverage gate, next build. Fails closed.
   web:
     uses: bookchaowalit/platform-ci-workflows/.github/workflows/ci-node.yml@87dc5e1c7e0416886a6371d5a101bb2ccba38edd # v1.1.1
     with:
+      require-tests: true
+      coverage-threshold: "93"
       build-command: NEXT_TELEMETRY_DISABLED=1 npm run build
 
   # Shared security scan: gitleaks, Semgrep, OSV-Scanner, Trivy.
