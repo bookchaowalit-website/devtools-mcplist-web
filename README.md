@@ -1,128 +1,68 @@
 # MCP List
 
-A comprehensive directory and documentation hub for Model Context Protocol (MCP) servers. This website serves both as a documentation site and as an MCP server aggregator that can proxy requests to other MCP servers.
+A browsable directory of the 23 Model Context Protocol servers in this portfolio. The list is curated by hand in
+`lib/mcp-servers.ts`: search it by name, description or tag, filter by one of the first seven tags, and open a detail
+page with each server's notes and declared tools. `/api/mcp` is a small JSON-RPC endpoint over the same list.
 
-## Features
+Live: https://mcplist.bookchaowalit.com (deployed by Vercel CLI; it can lag `main`, see `PRODUCT.md`).
 
-- **Directory of MCP Servers**: Browse and discover MCP servers with detailed documentation
-- **Server Documentation**: Individual pages for each MCP server with tool descriptions and usage examples
-- **MCP Server API**: Built-in MCP server endpoint at `/api/mcp` that can:
-  - List all available MCP servers
-  - List available tools from all registered servers
-  - Proxy tool calls to other MCP servers
-- **Modern UI**: Clean, responsive design built with Next.js and Tailwind CSS
-- **Dark Mode Support**: Automatic dark mode based on system preferences
+## What it does not do
 
-## Getting Started
+- No uptime or health checks, no ratings, no install guides, no compatibility badges, no community submissions.
+- It lists only this portfolio's own servers; their declared tools are not verified against the live servers.
 
-First, install dependencies:
+## Run
 
 ```bash
-npm install
-```
-
-Then run the development server:
-
-```bash
+npm ci
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## Adding a New MCP Server
-
-To add a new MCP server to the directory, edit `lib/mcp-servers.ts`:
-
-```typescript
-import { MCPServer } from './lib/mcp-servers';
-
-export const MCP_SERVERS: MCPServer[] = [
-  // ... existing servers
-  {
-    id: 'your-server-id',
-    name: 'Your Server Name',
-    url: 'https://your-server.com',
-    description: 'Brief description',
-    longDescription: 'Detailed description with markdown support',
-    tools: [
-      {
-        name: 'tool_name',
-        description: 'Tool description',
-        inputSchema: {
-          // JSON Schema for tool parameters
-        }
-      }
-    ],
-    author: 'Your Name',
-    version: '1.0.0',
-    tags: ['tag1', 'tag2']
-  }
-];
-```
-
-## MCP Server API
-
-The `/api/mcp` endpoint implements the Model Context Protocol and supports the following methods:
-
-### `initialize`
-Initialize the MCP connection.
-
-### `tools/list`
-List all available tools from all registered MCP servers.
-
-### `tools/call`
-Call a tool on a specific MCP server. Format: `{serverName}_{toolName}`
-
-### `servers/list`
-List all registered MCP servers.
-
-Example usage:
+## Checks
 
 ```bash
-curl -X POST http://localhost:3000/api/mcp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc": "2.0",
-    "id": 1,
-    "method": "tools/list"
-  }'
+npm test           # Vitest: directory logic, MCP route (proxy + CORS), page render, Sentry scrubbing
+npm run lint
+npm run typecheck
+npm run build
 ```
 
-## Project Structure
+CI (`.github/workflows/ci.yml`) runs the shared Node workflow (with a line-coverage gate) and the shared security
+scan on every push and PR to `main`.
 
+## MCP endpoint
+
+`POST /api/mcp` (JSON-RPC 2.0, the request `id` is echoed):
+
+- `initialize`, `tools/list` (every declared tool as `<serverId>_<toolName>`), `servers/list`.
+- `tools/call`:
+  - `mcplist_list_servers` (optional `tags`), `mcplist_get_server` (`id`) and `mcplist_proxy_tool_call`
+    (`serverId`, `toolName`, `arguments`) answer from the registry;
+  - any other `<serverId>_<toolName>` is forwarded to that registered server's own `<url>/api/mcp` (10 s timeout),
+    and its result or error is passed back. No other URL is ever fetched.
+  - Unknown server or hub tool, unknown method, or an upstream that does not answer JSON-RPC give a JSON-RPC error.
+- Browser calls are allowed only from the origins in `lib/cors.ts` (override with `CORS_ALLOWED_ORIGINS`).
+
+```bash
+curl -X POST http://localhost:3000/api/mcp -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"mcplist_get_server","arguments":{"id":"artblog"}}}'
 ```
-app/
-├── api/mcp/route.ts      # MCP server API endpoint
-├── mcp/[id]/page.tsx     # Individual server documentation pages
-├── layout.tsx            # Root layout with metadata
-└── page.tsx              # Homepage with server list
-lib/
-└── mcp-servers.ts        # Server data and utilities
-```
 
-## Deploy on Vercel
+## Code map
 
-The easiest way to deploy is using [Vercel](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme):
+- `lib/mcp-servers.ts`: the curated registry (servers, tools, schemas, tags).
+- `lib/mcp-hub.ts`: search, tag options and tool-name resolution, used by the page and the MCP route.
+- `lib/cors.ts`: origin allowlist for `/api/mcp`.
+- `app/page.tsx`, `app/mcp/[id]/page.tsx`: directory and server detail pages.
+- `lib/sentry.ts` + `instrumentation*.ts`: error reporting to Sentry, errors only, personal data stripped; off when
+  `NEXT_PUBLIC_SENTRY_DSN` is unset.
+- `app/more-projects/page.tsx`: shared portfolio link page (copied per repository, not a package).
 
-1. Push your code to GitHub
-2. Import your repository on Vercel
-3. Deploy!
+## Related
 
-The project is pre-configured with `vercel.json` for optimal deployment.
-
-## Tech Stack
-
-- **Next.js 16** - React framework with App Router
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **@modelcontextprotocol/sdk** - MCP protocol implementation
+- Mobile app: [bookchaowalit-mcplist-mobile](https://github.com/bookchaowalit-mobile/bookchaowalit-mcplist-mobile)
+- Portfolio: [bookchaowalit.com](https://bookchaowalit.com)
 
 ## License
 
 MIT
-
-## Related
-
-- **Mobile App:** [bookchaowalit-mcplist-mobile](https://github.com/bookchaowalit-mobile/bookchaowalit-mcplist-mobile)
-- **Portfolio:** [bookchaowalit.com](https://bookchaowalit.com)
-
