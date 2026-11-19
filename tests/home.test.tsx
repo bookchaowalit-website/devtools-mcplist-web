@@ -29,7 +29,7 @@ describe("home page", () => {
     const html = await home({ q: "blog", tag });
     expect(html).toContain(`in ${tag} for “blog”`);
     expect(html).toContain('href="/?q=blog"');
-    expect(html).toContain(`href="/?tag=${encodeURIComponent(tag)}">Clear`);
+    expect(html).toContain(`href="/?tag=${encodeURIComponent(tag)}#rs-search-q">Clear`);
   });
 
   it("ignores a tag the registry does not have and offers a way back when nothing matches", async () => {
