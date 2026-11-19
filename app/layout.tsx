@@ -1,97 +1,41 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
+import { SITE } from "@/components/mcp-views";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
+// The font variables sit on <html>: the Reader shell tokens live on :root and read them from there.
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-});
+const description = "A curated directory of Model Context Protocol (MCP) servers: what each one does, its tools and their input schemas.";
 
 export const metadata: Metadata = {
-  title: "MCP List - Model Context Protocol Server Directory",
-  description: "A comprehensive directory of Model Context Protocol (MCP) servers. Discover, explore, and integrate AI-powered tools into your applications.",
-  keywords: ["MCP", "Model Context Protocol", "AI", "Claude", "Anthropic", "Server Directory"],
-  authors: [{ name: "bookchaowalit" }],
-  openGraph: {
-    title: "MCP List - Model Context Protocol Server Directory",
-    description: "Discover and connect MCP servers for AI-powered applications",
-    type: "website",
-  },
+  title: { default: "MCP List | Bookchaowalit", template: "%s | MCP List" },
+  description,
+  keywords: ["MCP", "Model Context Protocol", "AI tools", "Server directory"],
+  authors: [{ name: "Bookchaowalit", url: "https://bookchaowalit.com" }],
+  metadataBase: new URL(SITE),
+  alternates: { canonical: "/" },
+  openGraph: { type: "website", title: "MCP List | Bookchaowalit", description, siteName: "Bookchaowalit" },
+  robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en" className="scroll-smooth">
-      <body
-        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
-      >
-        {/* THESIS: turn an MCP directory into a field atlas for deliberate discovery.
-OWN-WORLD: midnight navy, cyan orbit marks, coral annotations, and ruled server entries make protocol shape visible.
-STORY: search the registry, filter the field, open one server note, inspect its tools, then visit its declared URL.
-FIRST VIEWPORT: the discovery promise, registry count, search/filter controls, and first server rows are visible immediately.
-FORM: index rows, orbit diagrams, field notes, and tool registers replace a generic marketplace card grid.
-SEED: 1d51ce50 · assigned direction 4 · read mode.
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance */}
-  {/* Structured Data for SEO */}
-  <script
-    type="application/ld+json"
-    dangerouslySetInnerHTML={{
-      __html: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'WebApplication',
-        name: 'Mcplist',
-        url: 'https://bookchaowalit-mcplist.vercel.app',
-        description: 'Mcplist by Bookchaowalit - A modern web application',
-        applicationCategory: 'UtilitiesApplication',
-        operatingSystem: 'Web',
-        offers: {
-          '@type': 'Offer',
-          price: '0',
-          priceCurrency: 'USD'
-        },
-        author: {
-          '@type': 'Person',
-          name: 'Bookchaowalit',
-          url: 'https://bookchaowalit.com'
-        },
-        publisher: {
-          '@type': 'Organization',
-          name: 'Bookchaowalit',
-          url: 'https://bookchaowalit.com'
-        }
-      })
-    }}
-  />
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "MCP List",
+  url: SITE,
+  author: { "@type": "Person", name: "Bookchaowalit", url: "https://bookchaowalit.com" },
+  potentialAction: { "@type": "SearchAction", target: SITE + "/?q={search_term}", "query-input": "required name=search_term" },
+};
 
-  <script
-    type="application/ld+json"
-    dangerouslySetInnerHTML={{
-      __html: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'WebSite',
-        name: 'Mcplist',
-        url: 'https://bookchaowalit-mcplist.vercel.app',
-        potentialAction: {
-          '@type': 'SearchAction',
-          target: 'https://bookchaowalit-mcplist.vercel.app/more-projects',
-          'query-input': 'required name=search_term'
-        }
-      })
-    }}
-  />
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="en" className={geistSans.variable + " " + geistMono.variable}>
+      <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         {children}
       </body>
     </html>
   );
 }
-
-// SEO TODO: Add Open Graph tags for social sharing

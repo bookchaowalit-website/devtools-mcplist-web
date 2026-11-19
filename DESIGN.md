@@ -3,6 +3,12 @@ name: MCP / Atlas
 description: A midnight protocol atlas for discovering local MCP servers, inspecting their tools, and following declared links.
 ---
 
+> **Current look (2026-11-19):** the site uses the shared **Reader shell** (`READER.md`): Geist and Geist Mono,
+> light and dark, a searchable server list with tag chips, and detail pages that render the long description as
+> Markdown, list each tool with its input schema, and link previous/next. The "midnight atlas" notes below are the
+> earlier look, kept for history; its palette is no longer shipped.
+
+
 # Design System: MCP / Atlas
 
 ## Overview

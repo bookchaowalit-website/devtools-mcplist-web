@@ -56,7 +56,10 @@ curl -X POST http://localhost:3000/api/mcp -H "Content-Type: application/json" \
 - `app/page.tsx`, `app/mcp/[id]/page.tsx`: directory and server detail pages.
 - `lib/sentry.ts` + `instrumentation*.ts`: error reporting to Sentry, errors only, personal data stripped; off when
   `NEXT_PUBLIC_SENTRY_DSN` is unset.
-- `app/more-projects/page.tsx`: shared portfolio link page (copied per repository, not a package).
+- `app/reader-shell.css`, `components/reader-shell.tsx`, `tests/reader-shell.test.tsx`: the shared Reader shell, copied
+  byte for byte from content-techblog-web (see `READER.md`); `components/mcp-views.tsx` holds the pages and
+  `lib/markdown.tsx` renders the long descriptions. Search and tag filters are GET parameters (`/?q=…&tag=…`).
+  `/more-projects` is a permanent redirect to https://bookchaowalit.com/.
 
 ## Related
 
