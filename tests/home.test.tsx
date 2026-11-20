@@ -32,6 +32,23 @@ describe("home page", () => {
     expect(html).toContain(`href="/?tag=${encodeURIComponent(tag)}#rs-search-q">Clear`);
   });
 
+  it("filters by all seven tags while showing five chips", async () => {
+    const seven = Array.from(new Set(MCP_SERVERS.flatMap((s) => s.tags ?? []))).slice(0, 7);
+    const extra = seven[5];
+    const plain = await home();
+    expect(plain).toContain(`href="/?tag=${encodeURIComponent(extra)}"`);
+    expect(plain).toContain("More tags:");
+    const html = await home({ tag: extra });
+    const expected = MCP_SERVERS.filter((s) => (s.tags ?? []).includes(extra));
+    expect(expected.length).toBeLessThan(MCP_SERVERS.length);
+    expect(html).toContain(`${expected.length} of ${MCP_SERVERS.length}`);
+    for (const server of MCP_SERVERS) {
+      if (expected.includes(server)) expect(html).toContain(`href="/mcp/${server.id}"`);
+      else expect(html).not.toContain(`href="/mcp/${server.id}"`);
+    }
+    expect(html).toMatch(new RegExp(`class="rs-chip" href="/\\?tag=${extra}" aria-current="page"`));
+  });
+
   it("ignores a tag the registry does not have and offers a way back when nothing matches", async () => {
     const html = await home({ q: ["zzzz-nothing"], tag: "<script>" });
     expect(html).toContain("No server matches");

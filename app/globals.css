@@ -6,4 +6,7 @@ html, body { margin: 0; background: var(--rs-bg); }
 /* MCP List additions on top of the Reader shell. */
 .mc-link { color: var(--rs-accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .mc-url { color: var(--rs-muted); font-size: 15px; overflow-wrap: anywhere; }
+.mc-more-tags { margin: 16px 0 0; color: var(--rs-muted); font-size: 15px; }
+.mc-more-tags a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; }
+.mc-more-tags a[aria-current="page"] { font-weight: 600; }
 .rs-prose .mc-boundary { margin-top: 2em; color: var(--rs-muted); font-size: 16px; }

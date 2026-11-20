@@ -45,10 +45,14 @@ function toEntry(server: MCPServer): Entry {
 }
 
 export function HomeView({ servers, query = "", tag = "" }: { servers: MCPServer[]; query?: string; tag?: string }) {
-  // Chips come from tags the registry really has, never straight from the URL. Five keep the first server
-  // row inside the first phone screen.
-  const tags = tagOptions(servers, 5).slice(1);
-  const activeTag = tags.includes(tag) ? tag : "";
+  // Filters accept the first seven tags the registry really has, never a raw URL value. Only five are chips,
+  // which keeps the first server row inside the first phone screen; the rest are links under the list, and
+  // a selected one joins the chips so the active filter stays visible.
+  const allTags = tagOptions(servers, 7).slice(1);
+  const activeTag = allTags.includes(tag) ? tag : "";
+  const chipTags = allTags.slice(0, 5);
+  const moreTags = allTags.slice(5);
+  const tags = activeTag && !chipTags.includes(activeTag) ? [...chipTags, activeTag] : chipTags;
   const matching = filterServers(servers, "All", query);
   const shown = activeTag ? matching.filter((s) => (s.tags ?? []).includes(activeTag)) : matching;
   const href = (t: string, q = query) => {
@@ -90,6 +94,17 @@ export function HomeView({ servers, query = "", tag = "" }: { servers: MCPServer
         ) : (
           <EmptyState title="No servers yet" headingLevel={3}>Servers appear here once they are added to the registry.</EmptyState>
         )}
+        {moreTags.length ? (
+          <p className="mc-more-tags">
+            More tags:{" "}
+            {moreTags.map((t, i) => (
+              <span key={t}>
+                {i > 0 ? " · " : null}
+                <a href={href(t)} className="mc-link" aria-current={t === activeTag ? "page" : undefined}>{t}</a>
+              </span>
+            ))}
+          </p>
+        ) : null}
       </section>
       <section aria-labelledby="endpoint-title" className="rs-measure">
         <div className="rs-section-head"><h2 id="endpoint-title">Read before connecting</h2></div>
