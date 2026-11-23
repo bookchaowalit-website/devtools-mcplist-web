@@ -226,3 +226,6 @@
 
 /* The top bar is sticky: keep skip-link targets and keyboard-focused controls clear of it when the page scrolls to them. */
 html { scroll-padding-top: 64px; scroll-padding-bottom: 16px; }
+/* Between the phone breakpoint and 1024px the brand and the links can wrap to two rows (about 90px) while the bar is
+   still sticky, so leave room for both rows. */
+@media (min-width: 641px) and (max-width: 1023px) { html { scroll-padding-top: 112px; } }

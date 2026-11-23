@@ -50,7 +50,8 @@ not installed. Copy these four files **byte for byte** (check with `sha256sum`):
   `:lang(th)` (Thai stacks marks above and below the line); put `lang="th"` on Thai content or pages. The
   Thai rules match the element's own language, so `<Prose lang="th">` works inside an English page.
 - **Top bar**: brand (links home), a few plain links, the hub link is added for you. Sticky on wider
-  screens; on phones it wraps and scrolls away, so links are never hidden behind a menu.
+  screens; on phones it wraps and scrolls away, so links are never hidden behind a menu. Scroll padding
+  leaves room for the bar: 64px, and 112px between 641px and 1023px, where it can wrap to two rows.
 - **Footer**: `ReaderFoot` always links back to https://bookchaowalit.com/ ("More projects"), plus Source,
   Privacy and Status, optional extra links and one honest note about where the content comes from.
 - **Floor:** text ≥ 12px, controls ≥ 44px, 3px focus ring never clipped (no `overflow: hidden` around

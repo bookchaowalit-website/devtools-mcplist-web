@@ -247,6 +247,8 @@ describe("stylesheet floor", () => {
 
   it("keeps the sticky-bar scroll padding, the reading measure and the Thai line height", () => {
     expect(css).toContain("html { scroll-padding-top: 64px;");
+    // A two-row sticky bar (641–1023px) must not cover the control the page scrolls to.
+    expect(css).toContain("@media (min-width: 641px) and (max-width: 1023px) { html { scroll-padding-top: 112px; } }");
     expect(css).toContain("--rs-measure: 68ch;");
     expect(css).toMatch(/:lang\(th\) \{ --rs-leading: 1\.8; \}/);
   });
